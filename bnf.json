@@ -1,0 +1,32 @@
+{
+  "nonTerminals": [
+    "<numeros>",
+    "<sinal>",
+    "<nDigitos>",
+    "<digito>"
+  ],
+  "rules": [
+    "<numeros> ::= <sinal> <nDigitos> . <nDigitos> E <sinal> <nDigitos> | <sinal> <nDigitos> .",
+    "<sinal> ::= + | - | null",
+    "<nDigitos> ::= <nDigitos> <digito> | <digito>",
+    "<digito> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9"
+  ],
+  "terminals": [
+    "+",
+    "-",
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    ".",
+    "E",
+    "null"
+  ],
+  "initialSymbol": "<numeros>"
+}
