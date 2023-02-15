@@ -148,6 +148,8 @@ func main() {
 		log.Fatal("Error when opening file: ", err)
 	}
 
+	fmt.Println("Parsing Grammar file...")
+
 	var parsedGrammar Grammar
 	err = json.Unmarshal(content, &parsedGrammar)
 	if err != nil {
@@ -161,15 +163,23 @@ func main() {
 	}
 	fmt.Println("Grammar Accepted")
 
-	fmt.Print("Input: ")
+	for {
+		fmt.Print("\n(type :quit to close)\nExpression to validate: ")
 
-	var input string
-	fmt.Scanln(&input)
+		var input string
+		fmt.Scanln(&input)
 
-	res := parsedGrammar.ValidateInput(input)
-	if !res {
-		fmt.Println("Invalid expression")
-	} else {
-		fmt.Println("Valid expression")
+		if input == ":quit" {
+			fmt.Println("Closing program...")
+			break
+		}
+
+		res := parsedGrammar.ValidateInput(input)
+		if !res {
+			fmt.Println("\nInvalid expression")
+		} else {
+			fmt.Println("\nValid expression")
+		}
 	}
+
 }
