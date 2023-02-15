@@ -65,24 +65,79 @@ func (g *Grammar) ValidateGrammar() error {
 
 func (g *Grammar) ValidateInput(input string) bool {
 	inputSlice := strings.Split(strings.Trim(input, " "), "")
-	for _, c := range inputSlice {
-		if !g.validateRule(c, g.InitialSymbol, g.RulesMap[g.InitialSymbol]) {
-			return false
-		}
-	}
-	return true
+	// for _, c := range inputSlice {
+	// 	if !g.validateRule(c, g.InitialSymbol, g.RulesMap[g.InitialSymbol]) {
+	// 		return false
+	// 	}
+	// }
+	return g.validateFormat(inputSlice, g.InitialSymbol, g.RulesMap[g.InitialSymbol])
 }
 
-func (g *Grammar) validateRule(c string, rule string, expression []string) bool {
-	for i, expressionSymbol := range expression {
-		exp, isNonTerminal := g.RulesMap[expressionSymbol]
-		if isNonTerminal {
-			g.validateRule(c, expressionSymbol, exp)
+// func (g *Grammar) validateRule(c string, rule string, expression []string) bool {
+
+// 	if slices.Contains(expression, "|") {
+// 		concatExpression := strings.Join(expression, "<*separator*>")
+// 		splitExpressions := strings.Split(concatExpression, "|")
+// 		for _, e := range splitExpressions {
+// 			possibleExpressions := strings.Split(e, "<*separator*>")
+// 			res := g.validateRule(c, rule, possibleExpressions)
+// 			if res {
+// 				return true
+// 			}
+// 		}
+// 	}
+
+// 	for _, expressionSymbol := range expression {
+// 		if expressionSymbol != rule {
+// 			if slices.Contains(g.Terminals, expressionSymbol) {
+// 				if c == expressionSymbol {
+// 					return true
+// 				}
+// 			}
+
+// 			exp, isNonTerminal := g.RulesMap[expressionSymbol]
+// 			if isNonTerminal {
+// 				res := g.validateRule(c, expressionSymbol, exp)
+// 				if res {
+// 					return true
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return false
+// }
+
+func (g *Grammar) validateFormat(input []string, rule string, expression []string) bool {
+
+	if slices.Contains(expression, "|") {
+		concatExpression := strings.Join(expression, "<*separator*>")
+		splitExpressions := strings.Split(concatExpression, "|")
+		var isValidVariant bool
+		for _, exp := range splitExpressions {
+			possibleExpressions := strings.Split(exp, "<*separator*>")
+			isValidVariant = g.validateFormat(input, rule, possibleExpressions)
 		}
-		if expressionSymbol == "|" {
-			return g.validateRule(c, rule, expression[:i]) || g.validateRule(c, rule, expression[i:])
+		return isValidVariant
+	}
+	for _, symbol := range expression {
+		if symbol == "null" {
+			continue
 		}
 
+		if slices.Contains(g.Terminals, symbol) && !slices.Contains(input, symbol) {
+			if rule == g.InitialSymbol {
+				return false
+			}
+			continue
+		}
+
+		if slices.Contains(g.NonTerminals, symbol) {
+			if slices.Contains(g.RulesMap[symbol], symbol) {
+				continue
+			} else {
+				g.validateFormat(input, symbol, g.RulesMap[symbol])
+			}
+		}
 	}
 	return true
 }
